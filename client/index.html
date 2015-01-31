@@ -1,19 +1,27 @@
 <html>
   <head>
     <title>Reddit Commute</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
     <style media="screen">
       body{
         font-family : 'Montserrat';
       }
     </style>
+
     <script src="http://fb.me/react-0.12.2.js"></script>
     <script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
     <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" media="screen" title="no title" charset="utf-8">
+    <link href="bower_components/bootstrap-material-design/dist/css/ripples.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap-material-design/dist/css/material-wfont.min.css" rel="stylesheet">
   </head>
   <body>
-    <div id="content"></div>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-xs-12" id="content"></div>
+      </div>
+
     <script type="text/jsx">
 
     var articles = [ // Mock data
@@ -27,7 +35,7 @@
         return (
           <div>
             <h1> Popular Articles </h1>
-            <ArticleList></ArticleList>
+            <ArticleList articles={this.props.articles}></ArticleList>
             <TimeBar></TimeBar>
           </div>
         )
@@ -38,16 +46,17 @@
 
 
     var ArticleList = React.createClass({
-      render : function () {
-        var rows = [];
+      render: function () {
+        var elements = [];
 
-        /*this.props.articles.forEach(function(article){
-          rows.push(<Article>)
-        });*/
+        this.props.articles.forEach(function(article){
+          elements.push(<Article title={article.title} duration={article.duration} upvotes={article.upvotes}/>)
+        });
 
         return (
-          <div>
-            {rows}
+
+          <div className="list-group">
+            {elements}
           </div>
         )
       }
@@ -65,7 +74,15 @@
     var Article = React.createClass({
       render: function () {
         return (
-          <p> Article </p>
+          <div className="list-group-item">
+            <div className="row-action-primary">
+              <i>{this.props.duration}</i>
+            </div>
+            <div className="row-content">
+              <p className="list-group-item-text">{this.props.title}</p>
+              <p className="list-group-item-text"><i>Add to reading list</i></p>
+            </div>
+          </div>
         )
       }
     });
