@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <title>Reddit Commute</title>
+    <link href='http://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet' type='text/css'>
+    <style media="screen">
+      body{
+        font-family : 'Montserrat';
+      }
+    </style>
+    <script src="http://fb.me/react-0.12.2.js"></script>
+    <script src="http://fb.me/JSXTransformer-0.12.2.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/showdown/0.3.1/showdown.min.js"></script>
+  </head>
+  <body>
+    <div id="content"></div>
+    <script type="text/jsx">
+
+    var articles = [ // Mock data
+      { title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110},
+      { title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141},
+      { title : "Guides for careers", duration : 20, upvotes : 179}
+    ];
+
+    var ArticleBox = React.createClass({
+      render: function(){
+        return (
+          <div>
+            <h1> Popular Articles </h1>
+            <ArticleList></ArticleList>
+            <TimeBar></TimeBar>
+          </div>
+        )
+      }
+    });
+
+    var ArticleForm;
+
+
+    var ArticleList = React.createClass({
+      render : function () {
+        var rows = [];
+
+        /*this.props.articles.forEach(function(article){
+          rows.push(<Article>)
+        });*/
+
+        return (
+          <div>
+            {rows}
+          </div>
+        )
+      }
+    });
+
+
+    var TimeBar = React.createClass({
+      render: function () {
+        return (
+          <div className="timeBar">Remaining time</div>
+        )
+      }
+    });
+
+    var Article = React.createClass({
+      render: function () {
+        return (
+          <p> Article </p>
+        )
+      }
+    });
+
+    React.render(
+      <ArticleBox articles={articles}/>, document.getElementById('content')
+    );
+    </script>
+
+  </body>
+</html>
