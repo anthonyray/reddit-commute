@@ -25,17 +25,24 @@
     <script type="text/jsx">
 
     var articles = [ // Mock data
-      { title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110},
-      { title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141},
-      { title : "Guides for careers", duration : 20, upvotes : 179}
+      { title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
+      { title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: false},
+      { title : "Guides for careers", duration : 20, upvotes : 179, selected: true}
     ];
+
+    /*articles.map(function(article){
+      article.selected = false;
+    });*/
 
     var ArticleBox = React.createClass({
       render: function(){
+        var filteredArticles = this.props.articles.filter(function(article){
+          return article.selected == false;
+        })
         return (
           <div>
             <h1> Popular Articles </h1>
-            <ArticleList articles={this.props.articles}></ArticleList>
+            <ArticleList articles={filteredArticles}></ArticleList>
             <TimeBar></TimeBar>
           </div>
         )
