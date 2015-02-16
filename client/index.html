@@ -37,29 +37,66 @@
 
     var ArticleBox = React.createClass({
       getInitialState: function(){
-        return { articles : [{ id:0, title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
-        { id:1, title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: false},
-        { id:2, title : "Guides for careers", duration : 20, upvotes : 179, selected: false}] }
+        return {
+          articles : [{ id:0, title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
+                      { id:1, title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: false},
+                      { id:2, title : "Guides for careers", duration : 20, upvotes : 179, selected: false}],
+          commuteTime : 0
+          }
+
+
       },
 
       handleArticleSubmit: function (data) {
         console.log(data);
         this.state.articles[data.id].selected = true;
-        this.setState({articles : this.state.articles});
+        this.setState(this.state);
       },
+
+      handleFormSubmit : function(data){
+        this.state.commuteTime = data.commuteTime
+        this.setState(this.state);
+      },
+
       render: function(){
 
         return (
           <div>
+            <h1> Subreddit </h1>
+            <ArticleForm onFormSubmit={this.handleFormSubmit}></ArticleForm>
             <h1> Popular Articles </h1>
             <ArticleList articles={this.state.articles} onArticleSubmit={this.handleArticleSubmit}></ArticleList>
-          <TimeBar articles={this.state.articles} commuteTime={45}></TimeBar>
+            <TimeBar articles={this.state.articles} commuteTime={this.state.commuteTime}></TimeBar>
           </div>
         )
       }
     });
 
-    var ArticleForm;
+    var ArticleForm = React.createClass({
+      handleSubmit : function (e) {
+          e.preventDefault();
+          var commuteTime = this.refs.commuteTime.getDOMNode().value.trim()
+          var subreddit = this.refs.subreddit.getDOMNode().value.trim()
+          if (!commuteTime || !subreddit){
+            return;
+          }
+
+          this.props.onFormSubmit({commuteTime : commuteTime, subreddit : subreddit});
+      },
+      render : function(){
+        return (
+          <div className="form-group text-center">
+
+            <form onSubmit={this.handleSubmit}>
+            <input className="form-control floating-label" id="focusedInput" type="text" placeholder="Enter the name of the subreddit" ref="subreddit"></input>
+            <input className="form-control floating-label" id="focusedInput" type="text" placeholder="And the duration" ref="commuteTime"></input>
+
+            <button type="submit" className="btn btn-primary">Submit</button>
+            </form>
+          </div>
+        )
+      }
+    });
 
     var ArticleList = React.createClass({
       addToReadingList: function (index) {
@@ -137,6 +174,5 @@
       <ArticleBox subreddit="tifu"/>, document.getElementById('content')
     );
     </script>
-
   </body>
 </html>
