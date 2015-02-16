@@ -26,8 +26,8 @@
 
     var articles = [ // Mock data
       { title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
-      { title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: false},
-      { title : "Guides for careers", duration : 20, upvotes : 179, selected: true}
+      { title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: true},
+      { title : "Guides for careers", duration : 20, upvotes : 179, selected: false}
     ];
 
     /*articles.map(function(article){
@@ -35,15 +35,24 @@
     });*/
 
     var ArticleBox = React.createClass({
+      getInitialState: function(){
+        return { articles : [{ id:0, title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
+        { id:1, title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: false},
+        { id:2, title : "Guides for careers", duration : 20, upvotes : 179, selected: false}] }
+      },
+
+      handleArticleSubmit: function (data) {
+        console.log(data);
+        this.state.articles[data.id].selected = true;
+        this.setState({articles : this.state.articles});
+      },
       render: function(){
-        var filteredArticles = this.props.articles.filter(function(article){
-          return article.selected == false;
-        })
+
         return (
           <div>
             <h1> Popular Articles </h1>
-            <ArticleList articles={filteredArticles}></ArticleList>
-            <TimeBar></TimeBar>
+            <ArticleList articles={this.state.articles} onArticleSubmit={this.handleArticleSubmit}></ArticleList>
+          <TimeBar articles={this.state.articles}></TimeBar>
           </div>
         )
       }
@@ -51,13 +60,19 @@
 
     var ArticleForm;
 
-
     var ArticleList = React.createClass({
+      addToReadingList: function (index) {
+        this.props.onArticleSubmit({id : index});
+      },
       render: function () {
         var elements = [];
+        var self = this;
+        var filteredArticles = this.props.articles.filter(function(article){
+          return article.selected == false;
+        })
 
-        this.props.articles.forEach(function(article){
-          elements.push(<Article title={article.title} duration={article.duration} upvotes={article.upvotes}/>)
+        filteredArticles.forEach(function(article,i){
+          elements.push(<Article key={article.id} id={article.id} title={article.title} duration={article.duration} upvotes={article.upvotes} onArticleSubmit={self.addToReadingList.bind(null,article.id)}/>)
         });
 
         return (
@@ -69,16 +84,35 @@
       }
     });
 
-
     var TimeBar = React.createClass({
       render: function () {
+        var filtered_articles = this.props.articles.filter(function(article){
+          return article.selected == true;
+        })
+
+        var duration;
+
+        if (filtered_articles.length > 1){
+          duration = filtered_articles.reduce(function(prev,curr){
+            return prev + curr.duration;
+          },0);
+        } else if (filtered_articles.length == 1){
+          duration = filtered_articles[0].duration
+        } else {
+          duration = 0;
+        }
+
         return (
-          <div className="timeBar">Remaining time</div>
+          <div className="timeBar">Remaining time : {duration}</div>
         )
       }
     });
 
     var Article = React.createClass({
+      addToReadingList: function (e) {
+        e.preventDefault();
+        this.props.onArticleSubmit({id : this.props.id});
+      },
       render: function () {
         return (
           <div className="list-group-item">
@@ -87,7 +121,7 @@
             </div>
             <div className="row-content">
               <p className="list-group-item-text">{this.props.title}</p>
-              <p className="list-group-item-text"><i>Add to reading list</i></p>
+              <p className="list-group-item-text"><a onClick={this.addToReadingList}><i>Add to reading list</i></a></p>
             </div>
           </div>
         )
@@ -95,7 +129,7 @@
     });
 
     React.render(
-      <ArticleBox articles={articles}/>, document.getElementById('content')
+      <ArticleBox subreddit="tifu"/>, document.getElementById('content')
     );
     </script>
 
