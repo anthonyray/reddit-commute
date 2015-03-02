@@ -38,23 +38,62 @@
     var ArticleBox = React.createClass({
       getInitialState: function(){
         return {
-          articles : [{ id:0, title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
+          /*articles : [{ id:0, title : "The following comment was upvoted to 1000+ in mainstream reddit, gilded x3.", duration : 10, upvotes : 110, selected: false},
                       { id:1, title : "Quality and Convenience: Why I Switched From This to That.", duration : 2, upvotes : 141, selected: false},
-                      { id:2, title : "Guides for careers", duration : 20, upvotes : 179, selected: false}],
-          commuteTime : 0
+                      { id:2, title : "Guides for careers", duration : 20, upvotes : 179, selected: false}],*/
+          articles : [],
+          commuteTime : 0,
+          subreddit : "tifu"
           }
+      },
 
+      componentDidMount: function() {
+        var url = 'http://reddit.com/r/'+this.state.subreddit+'.json?jsonp=?'
+        $.getJSON(url, function(response) {
+          var articles = response.data.children
+                .filter(function(el){ return el.kind == "t3"})
+                .map(function(el){ return el.data;})
+                .map(function(el,i){ return { id : i, selected : false, is_self : el.is_self, author : el.author, num_comments : el.num_comments, ups : el.ups, downs : el.downs, selftext : el.selftext, title : el.title, stickied : el.stickied, num_words : el.selftext.split(' ').length, duration : Math.ceil((el.selftext.split(' ').length / 300))}})
+          console.log(articles.length);
 
+          if (this.isMounted()) {
+            this.state.articles = articles;
+            this.setState(this.state);
+          }
+        }.bind(this));
       },
 
       handleArticleSubmit: function (data) {
-        console.log(data);
-        this.state.articles[data.id].selected = true;
-        this.setState(this.state);
+
+        var filtered_articles = this.state.articles.filter(function(article){
+          return article.selected == true;
+        })
+
+        var duration;
+
+        if (filtered_articles.length > 1){
+          duration = filtered_articles.reduce(function(prev,curr){
+            return prev + curr.duration;
+          },0);
+        } else if (filtered_articles.length == 1){
+          duration = filtered_articles[0].duration
+        } else {
+          duration = 0;
+        }
+
+        if (duration < this.state.commuteTime ){
+          this.state.articles[data.id].selected = true;
+          this.setState(this.state);
+        }
+        else{
+          console.log("Maximum duration exceeded");
+        }
+
       },
 
       handleFormSubmit : function(data){
-        this.state.commuteTime = data.commuteTime
+        this.state.subreddit = data.subreddit;
+        this.state.commuteTime = data.commuteTime;
         this.setState(this.state);
       },
 
@@ -65,7 +104,7 @@
             <h1> Subreddit </h1>
             <ArticleForm onFormSubmit={this.handleFormSubmit}></ArticleForm>
             <h1> Popular Articles </h1>
-            <ArticleList articles={this.state.articles} onArticleSubmit={this.handleArticleSubmit}></ArticleList>
+            <ArticleList articles={this.state.articles} commuteTime={this.state.commuteTime} onArticleSubmit={this.handleArticleSubmit}></ArticleList>
             <TimeBar articles={this.state.articles} commuteTime={this.state.commuteTime}></TimeBar>
           </div>
         )
